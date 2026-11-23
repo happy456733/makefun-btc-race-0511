@@ -4,9 +4,13 @@
 // Idea: ride BTC's intraday swings with a small set of fixed rules, all in
 // integer (BigInt) arithmetic so two runs are byte-identical.
 //   - Buy all-in on the first tradeable bar.
-//   - While long, sell everything at +1.5% over the entry cost, or at -2.5%
+//   - While long, sell everything at +1.5% over the entry cost, or at -2.0%
 //     (stop-loss). The entry cost is the position's cost per unit, read from
-//     the account the harness sends each batch.
+//     the account the harness sends each batch. The stop is set at -2.0%
+//     rather than -2.5% because the backtest never fired it (win rate 1.0)
+//     and the position is all-in: a tighter stop caps the worst loss on one
+//     bad trade at 2.0% of the account instead of 2.5%, while the dev
+//     window's worst drawdown was only 1.58%, so it still has headroom.
 //   - While flat after a take-profit exit, buy all-in again on a 1.0%
 //     pullback from the highest close seen since the exit, but only while the
 //     close is at or above its 60-bar exponential moving average (no buying
@@ -26,7 +30,7 @@ const SYMBOL = 'CBBTC';
 
 // Rule parameters, in basis points.
 const TAKE_PROFIT_BPS = 150n; // +1.5% over entry cost
-const STOP_LOSS_BPS = 250n; // -2.5% under entry cost
+const STOP_LOSS_BPS = 200n; // -2.0% under entry cost
 const PULLBACK_BPS = 100n; // 1.0% below the post-exit peak
 const BOUNCE_BPS = 150n; // 1.5% above the post-exit low (after a stop)
 const EMA_BARS = 60n; // trend filter length
